@@ -2,11 +2,9 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
 import connectDB from "./db/index.js";
 import authenticateUser from "./middleware/auth.js";
 import User from "./models/user.js";
-import { upload } from "./middleware/multer.js";
 import products from "./utils/products.js";
 
 const app = express();
@@ -72,6 +70,33 @@ app.get("/api/products", async (req, res) => {
     }
     catch (err) {
         console.log("Error:", err);
+    }
+});
+
+app.post("/api/address", authenticateUser, async (req, res) => {
+    try {
+        const { firstName, lastName, country, company, street, city, state, phone, postal, instruction } = req.body;
+        const newAddress = { firstName, lastName, country, company, street, city, state, phone, postal, instruction };
+        const user = await User.findByIdAndUpdate(req.user._id, { $push: { addressess: newAddress } }, { new: true });
+        return res.json({ user });
+    }
+    catch (err) {
+        console.log("Error:", err);
+    }
+});
+
+app.get("/api/address",authenticateUser, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId); 
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const addresses = user.addresses || [];
+        return res.json({ addresses });
+    } catch (err) {
+        console.log("Error:", err);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 

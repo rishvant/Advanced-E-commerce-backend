@@ -3,6 +3,21 @@ const Schema = mongoose.Schema;
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const addressSchema = new Schema({
+    firstName: String,
+    lastName: String,
+    country: String,
+    company: String,
+    street: String,
+    city: String,
+    state: String,
+    phone: Number,
+    postal: Number,
+    instruction: String,
+},
+    { timestamps: true }
+);
+
 const userSchema = new Schema({
     name: String,
     email: {
@@ -16,6 +31,7 @@ const userSchema = new Schema({
         type: Number,
     },
     image: String,
+    addressess: [addressSchema]
 },
     { timestamps: true }
 );
